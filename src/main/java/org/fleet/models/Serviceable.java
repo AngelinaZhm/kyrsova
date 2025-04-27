@@ -1,4 +1,4 @@
-package org.example.models;
+package org.fleet.models;
 
 public interface Serviceable {
     void performService();

@@ -1,4 +1,4 @@
-package org.example.utils;
+package org.fleet.utils;
 
 public class Utils {
     public static int factorial (int n) {

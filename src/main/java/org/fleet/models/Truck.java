@@ -1,4 +1,4 @@
-package org.example.models;
+package org.fleet.models;
 
 public class Truck extends Vehicle {
     private double loadCapacity;

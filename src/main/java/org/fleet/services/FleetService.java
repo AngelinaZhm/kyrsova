@@ -1,7 +1,7 @@
-package org.example.services;
+package org.fleet.services;
 
-import org.example.models.Car;
-import org.example.models.Vehicle;
+import org.fleet.models.Car;
+import org.fleet.models.Vehicle;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
-package org.example.restcontroller;
+package org.fleet.restcontroller;
 
-import org.example.services.FleetService;
-import org.example.models.Vehicle;
+import org.fleet.services.FleetService;
+import org.fleet.models.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

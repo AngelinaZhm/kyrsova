@@ -1,4 +1,4 @@
-package org.example.restcontroller;
+package org.fleet.restcontroller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,4 +1,4 @@
-package org.example.models;
+package org.fleet.models;
 
 public abstract class Vehicle {
     private String licensePlate;
