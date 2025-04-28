@@ -1,5 +1,6 @@
 package org.fleet.services;
 
+import org.fleet.dtos.VehicleStats;
 import org.fleet.models.Car;
 import org.fleet.models.Vehicle;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class FleetService {
@@ -37,17 +39,34 @@ public class FleetService {
                 .filter(Vehicle::isAvailable)
                 .collect(Collectors.toList());
    }
-   public String getStats() {
+
+    public VehicleStats getStats() {
         long total = vehicles.size();
         long available = vehicles.stream().filter(Vehicle::isAvailable).count();
         long rented = total - available;
-        return String.format("Всього: %, Доступні: %, В оренді: %",
-                total,available,rented);
-   }
+
+        return new VehicleStats(total, available, rented);
+    }
+
     public List<Vehicle> searchByPlate(String query) {
         String q = query.toLowerCase();
         return vehicles.stream()
                 .filter(v -> v.getLicensePlate().toLowerCase().contains(q))
                 .collect(Collectors.toList());
     }
+    public void addVehicle(String plate, int seats) {
+        boolean exists = vehicles.stream()
+                .anyMatch(v -> v.getLicensePlate().equalsIgnoreCase(plate));
+        if (exists) {
+            throw new IllegalArgumentException("Авто з цим номерним знаком : " + plate + " вже зареєстровано.");
+        }
+        vehicles.add(new Car(plate, seats));
+    }
+    public void deleteVehicle(String plate) {
+        boolean removed = vehicles.removeIf(vehicle -> vehicle.getLicensePlate().equalsIgnoreCase(plate));
+        if (!removed) {
+            throw new IllegalArgumentException("Авто з цим номерним знаком : " + plate + " не знайдено.");
+        }
+    }
+
 }

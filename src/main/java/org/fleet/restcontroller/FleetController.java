@@ -1,5 +1,6 @@
 package org.fleet.restcontroller;
 
+import org.fleet.dtos.VehicleStats;
 import org.fleet.services.FleetService;
 import org.fleet.models.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class FleetController {
     }
 //    Статистика автопарку
     @GetMapping("/stats")
-    public String stats() {
+    public VehicleStats stats() {
         return fleetService.getStats();
     }
 //    Пошук за частиною номера
@@ -41,5 +42,13 @@ public class FleetController {
     @PostMapping("/return")
     public void returnBack(@RequestParam String plate) {
         fleetService.returnVehicle(plate);
+    }
+    @PostMapping("/addVehicle")
+    public void addVehicle(@RequestParam String plate, @RequestParam int seats) {
+        fleetService.addVehicle(plate, seats);
+    }
+    @DeleteMapping("/deleteVehicle")
+    public void deleteVehicle(@RequestParam String plate) {
+        fleetService.deleteVehicle(plate);
     }
 }
