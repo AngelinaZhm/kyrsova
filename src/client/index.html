@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Система управління автопарком</title>
+  <style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --accent-color: #3498db;
+        --light-color: #ecf0f1;
+        --success-color: #2ecc71;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --border-radius: 4px;
+        --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 0;
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+    }
+
+    header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo h1 {
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .tabs {
+        display: flex;
+        background-color: white;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+    }
+
+    .tab {
+        padding: 15px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .tab:hover {
+        background-color: var(--light-color);
+    }
+
+    .tab.active {
+        border-bottom: 3px solid var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    .panel {
+        display: none;
+        background-color: white;
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+    }
+
+    .panel.active {
+        display: block;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: var(--box-shadow);
+        text-align: center;
+    }
+
+    .stat-card h3 {
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .stat-card .value {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--accent-color);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: var(--light-color);
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: var(--accent-color);
+        color: white;
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: var(--warning-color);
+        color: white;
+        margin-right: 8px;
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    .search-bar {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        font-size: 16px;
+    }
+
+    .search-bar button {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        cursor: pointer;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-success {
+        background-color: rgba(46, 204, 113, 0.2);
+        color: var(--success-color);
+    }
+
+    .badge-warning {
+        background-color: rgba(243, 156, 18, 0.2);
+        color: var(--warning-color);
+    }
+
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        color: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .toast.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast-success {
+        background-color: var(--success-color);
+    }
+
+    .toast-error {
+        background-color: var(--danger-color);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #777;
+    }
+
+    .empty-state img {
+        max-width: 120px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: var(--accent-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .tabs {
+            flex-direction: column;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .header .container {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+
+    /* Додаємо стилі для сортування */
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+    }
+
+    .sortable:hover {
+        background-color: #e9ecef;
+    }
+
+    .sort-asc::after {
+        content: ' ▲';
+        position: absolute;
+        right: 8px;
+    }
+
+    .sort-desc::after {
+        content: ' ▼';
+        position: absolute;
+        right: 8px;
+    }
+  </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<header>
+  <div class="container">
+    <div class="logo">
+      <h1>Система управління автопарком</h1>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="tabs">
+    <div class="tab active" data-target="all-vehicles">Усі автомобілі</div>
+    <div class="tab" data-target="available-vehicles">Доступні автомобілі</div>
+    <div class="tab" data-target="fleet-stats">Статистика автопарку</div>
+    <div class="tab" data-target="add-vehicle">Додати автомобіль</div>
+  </div>
+
+  <!-- Усі автомобілі -->
+  <div id="all-vehicles" class="panel active">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Пошук за номером...">
+      <button id="search-button">Пошук</button>
+    </div>
+
+    <div class="card table-responsive">
+      <table id="all-vehicles-table">
+        <thead>
+        <tr>
+          <th>Номер</th>
+          <th class="sortable" data-sort="seats">Кількість місць</th>
+          <th>Модель</th>
+          <th class="sortable" data-sort="year">Рік</th>
+          <th>Статус</th>
+          <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody id="all-vehicles-body">
+        <tr>
+          <td colspan="6">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Завантаження даних...</p>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Доступні автомобілі -->
+  <div id="available-vehicles" class="panel">
+    <div class="card table-responsive">
+      <table>
+        <thead>
+        <tr>
+          <th>Номер</th>
+          <th class="sortable" data-sort="seats">Кількість місць</th>
+          <th>Модель</th>
+          <th class="sortable" data-sort="year">Рік</th>
+          <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody id="available-vehicles-body">
+        <tr>
+          <td colspan="3">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Завантаження даних...</p>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Статистика автопарку -->
+  <div id="fleet-stats" class="panel">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Усього автомобілів</h3>
+        <div id="total-vehicles" class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Доступні автомобілі</h3>
+        <div id="available-count" class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>В оренді</h3>
+        <div id="rented-count" class="value">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Додати автомобіль -->
+  <div id="add-vehicle" class="panel">
+    <div class="card">
+      <h2>Додати новий автомобіль</h2>
+      <form id="add-vehicle-form">
+        <div class="form-group">
+          <label for="plate">Номерний знак</label>
+          <input type="text" id="plate" required placeholder="Наприклад: AA1234BB">
+        </div>
+        <div class="form-group">
+          <label for="seats">Кількість місць</label>
+          <input type="number" id="seats" required min="1" placeholder="Наприклад: 4">
+        </div>
+        <div class="form-group">
+          <label for="model">Модель</label>
+          <input type="text" id="model" required min="1" placeholder="Наприклад: Ford">
+        </div>
+        <div class="form-group">
+          <label for="year">Рік випуску</label>
+          <input type="number" id="year" required min="1" placeholder="Наприклад: 2006">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Додати автомобіль</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  // API URL
+  const API_URL = 'http://localhost:8080';
+
+  // DOM елементи
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const searchInput = document.getElementById('search-input');
+  const searchButton = document.getElementById('search-button');
+  const allVehiclesBody = document.getElementById('all-vehicles-body');
+  const availableVehiclesBody = document.getElementById('available-vehicles-body');
+  const addVehicleForm = document.getElementById('add-vehicle-form');
+  const toastElement = document.getElementById('toast');
+
+  // Статистичні елементи
+  const totalVehiclesElement = document.getElementById('total-vehicles');
+  const availableCountElement = document.getElementById('available-count');
+  const rentedCountElement = document.getElementById('rented-count');
+
+  // Перемикання вкладок
+  tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+          // Видалення активного класу з усіх вкладок і панелей
+          tabs.forEach(t => t.classList.remove('active'));
+          panels.forEach(p => p.classList.remove('active'));
+
+          // Додавання активного класу до обраної вкладки
+          tab.classList.add('active');
+
+          // Відображення відповідної панелі
+          const targetPanel = document.getElementById(tab.dataset.target);
+          targetPanel.classList.add('active');
+
+          // Завантаження даних для активної вкладки
+          if (tab.dataset.target === 'all-vehicles') {
+              loadAllVehicles();
+          } else if (tab.dataset.target === 'available-vehicles') {
+              loadAvailableVehicles();
+          } else if (tab.dataset.target === 'fleet-stats') {
+              loadStats();
+          }
+      });
+  });
+
+  // Функція для відображення сповіщень
+  function showToast(message, type = 'success') {
+      toastElement.textContent = message;
+      toastElement.className = `toast toast-${type} active`;
+
+      setTimeout(() => {
+          toastElement.className = 'toast';
+      }, 3000);
+  }
+
+  // Функція для завантаження всіх автомобілів
+  async function loadAllVehicles() {
+      try {
+          allVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="6">
+                      <div class="loading">
+                          <div class="spinner"></div>
+                          <p>Завантаження даних...</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+
+          const response = await fetch(`${API_URL}/all`);
+          const vehicles = await response.json();
+
+          renderVehiclesTable(vehicles, allVehiclesBody, true);
+      } catch (error) {
+          console.error('Помилка при завантаженні автомобілів:', error);
+          allVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="6">
+                      <div class="empty-state">
+                          <p>Помилка при завантаженні даних. Спробуйте оновити сторінку.</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+          showToast('Помилка при завантаженні даних', 'error');
+      }
+  }
+
+  // Функція для завантаження доступних автомобілів
+  async function loadAvailableVehicles() {
+      try {
+          availableVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="3">
+                      <div class="loading">
+                          <div class="spinner"></div>
+                          <p>Завантаження даних...</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+
+          const response = await fetch(`${API_URL}/available`);
+          const vehicles = await response.json();
+
+          renderVehiclesTable(vehicles, availableVehiclesBody, false);
+      } catch (error) {
+          console.error('Помилка при завантаженні доступних автомобілів:', error);
+          availableVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="3">
+                      <div class="empty-state">
+                          <p>Помилка при завантаженні даних. Спробуйте оновити сторінку.</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+          showToast('Помилка при завантаженні даних', 'error');
+      }
+  }
+
+  // Функція для завантаження статистики
+  async function loadStats() {
+      try {
+          const response = await fetch(`${API_URL}/stats`);
+          const stats = await response.json();
+
+          totalVehiclesElement.textContent = stats.total || 0;
+          availableCountElement.textContent = stats.available || 0;
+          rentedCountElement.textContent = stats.rented || 0;
+      } catch (error) {
+          console.error('Помилка при завантаженні статистики:', error);
+          showToast('Помилка при завантаженні статистики', 'error');
+      }
+  }
+
+  // Функція для відображення таблиці з автомобілями
+  function renderVehiclesTable(vehicles, tableBody, showStatus = true) {
+      if (!vehicles || vehicles.length === 0) {
+          tableBody.innerHTML = `
+              <tr>
+                  <td colspan="${showStatus ? '6' : '5'}">
+                      <div class="empty-state">
+                          <p>Немає даних для відображення</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+          return;
+      }
+
+      let html = '';
+
+      vehicles.forEach(vehicle => {
+          html += `
+              <tr>
+                  <td>${vehicle.plate}</td>
+                  <td>${vehicle.seats}</td>
+                  <td>${vehicle.model}</td>
+                  <td>${vehicle.year}</td>
+          `;
+
+          if (showStatus) {
+              const statusClass = vehicle.available ? 'badge-success' : 'badge-warning';
+              const statusText = vehicle.available ? 'Доступний' : 'В оренді';
+
+              html += `<td><span class="badge ${statusClass}">${statusText}</span></td>`;
+          }
+
+          html += '<td>';
+
+          if (vehicle.available) {
+              html += `<button class="btn btn-warning" onclick="rentVehicle('${vehicle.plate}')">Орендувати</button>`;
+          } else {
+              html += `<button class="btn btn-success" onclick="returnVehicle('${vehicle.plate}')">Повернути</button>`;
+          }
+
+          html += `<button class="btn btn-danger" onclick="deleteVehicle('${vehicle.plate}')">Видалити</button>`;
+          html += '</td></tr>';
+      });
+
+      tableBody.innerHTML = html;
+
+      // Додаємо обробники подій для сортування
+      const table = tableBody.closest('table');
+      const sortableHeaders = table.querySelectorAll('.sortable');
+      
+      sortableHeaders.forEach(header => {
+          header.addEventListener('click', () => {
+              const sortField = header.dataset.sort;
+              const isAsc = !header.classList.contains('sort-asc');
+
+              // Видаляємо попередні класи сортування з усіх заголовків
+              sortableHeaders.forEach(h => {
+                  h.classList.remove('sort-asc', 'sort-desc');
+              });
+
+              // Додаємо новий клас сортування
+              header.classList.add(isAsc ? 'sort-asc' : 'sort-desc');
+
+              // Сортуємо дані
+              const sortedVehicles = [...vehicles].sort((a, b) => {
+                  const aValue = a[sortField];
+                  const bValue = b[sortField];
+                  
+                  if (typeof aValue === 'number') {
+                      return isAsc ? aValue - bValue : bValue - aValue;
+                  }
+                  return isAsc 
+                      ? aValue.toString().localeCompare(bValue.toString())
+                      : bValue.toString().localeCompare(aValue.toString());
+              });
+
+              // Оновлюємо таблицю з відсортованими даними
+              renderVehiclesTable(sortedVehicles, tableBody, showStatus);
+          });
+      });
+  }
+
+  // Функція для пошуку автомобілів за номером
+  async function searchVehicles() {
+      const query = searchInput.value.trim();
+
+      if (!query) {
+          loadAllVehicles();
+          return;
+      }
+
+      try {
+          allVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="6">
+                      <div class="loading">
+                          <div class="spinner"></div>
+                          <p>Пошук...</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+
+          const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+          const vehicles = await response.json();
+
+          renderVehiclesTable(vehicles, allVehiclesBody, true);
+      } catch (error) {
+          console.error('Помилка при пошуку автомобілів:', error);
+          allVehiclesBody.innerHTML = `
+              <tr>
+                  <td colspan="6">
+                      <div class="empty-state">
+                          <p>Помилка при пошуку даних. Спробуйте ще раз.</p>
+                      </div>
+                  </td>
+              </tr>
+          `;
+          showToast('Помилка при пошуку даних', 'error');
+      }
+  }
+
+  // Функція для оренди автомобіля
+  async function rentVehicle(plate) {
+      try {
+          const response = await fetch(`${API_URL}/rent?plate=${encodeURIComponent(plate)}`, {
+              method: 'POST'
+          });
+
+          if (response.ok) {
+              showToast(`Автомобіль ${plate} успішно орендовано`);
+              loadAllVehicles();
+              loadAvailableVehicles();
+              loadStats();
+          } else {
+              throw new Error('Помилка при оренді автомобіля');
+          }
+      } catch (error) {
+          console.error('Помилка при оренді автомобіля:', error);
+          showToast('Помилка при оренді автомобіля', 'error');
+      }
+  }
+
+  // Функція для повернення автомобіля
+  async function returnVehicle(plate) {
+      try {
+          const response = await fetch(`${API_URL}/return?plate=${encodeURIComponent(plate)}`, {
+              method: 'POST'
+          });
+
+          if (response.ok) {
+              showToast(`Автомобіль ${plate} успішно повернуто`);
+              loadAllVehicles();
+              loadAvailableVehicles();
+              loadStats();
+          } else {
+              throw new Error('Помилка при поверненні автомобіля');
+          }
+      } catch (error) {
+          console.error('Помилка при поверненні автомобіля:', error);
+          showToast('Помилка при поверненні автомобіля', 'error');
+      }
+  }
+
+  // Функція для видалення автомобіля
+  async function deleteVehicle(plate) {
+      if (!confirm(`Ви впевнені, що хочете видалити автомобіль ${plate}?`)) {
+          return;
+      }
+
+      try {
+          const response = await fetch(`${API_URL}/deleteVehicle?plate=${encodeURIComponent(plate)}`, {
+              method: 'DELETE'
+          });
+
+          if (response.ok) {
+              showToast(`Автомобіль ${plate} успішно видалено`);
+              loadAllVehicles();
+              loadAvailableVehicles();
+              loadStats();
+          } else {
+              throw new Error('Помилка при видаленні автомобіля');
+          }
+      } catch (error) {
+          console.error('Помилка при видаленні автомобіля:', error);
+          showToast('Помилка при видаленні автомобіля', 'error');
+      }
+  }
+
+  // Функція для додавання нового автомобіля
+  async function addVehicle(plate, seats, model, year) {
+      try {
+          const response = await fetch(`${API_URL}/addVehicle?plate=${encodeURIComponent(plate)}&seats=${seats}&model=${model}&year=${year}`, {
+              method: 'POST'
+          });
+
+          if (response.ok) {
+              showToast(`Автомобіль ${plate} успішно додано`);
+              loadAllVehicles();
+              loadAvailableVehicles();
+              loadStats();
+              return true;
+          } else {
+              throw new Error('Помилка при додаванні автомобіля');
+          }
+      } catch (error) {
+          console.error('Помилка при додаванні автомобіля:', error);
+          showToast('Помилка при додаванні автомобіля', 'error');
+          return false;
+      }
+  }
+
+  // Обробники подій
+  searchButton.addEventListener('click', searchVehicles);
+
+  searchInput.addEventListener('keyup', (event) => {
+      if (event.key === 'Enter') {
+          searchVehicles();
+      }
+  });
+
+  addVehicleForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const plateInput = document.getElementById('plate');
+      const seatsInput = document.getElementById('seats');
+      const modelInput = document.getElementById('model');
+      const yearInput = document.getElementById('year');
+
+      const plate = plateInput.value.trim();
+      const seats = parseInt(seatsInput.value);
+      const model = modelInput.value.trim();
+      const year = parseInt(yearInput.value);
+
+      if (!plate) {
+          showToast('Введіть номерний знак автомобіля', 'error');
+          return;
+      }
+
+      if (isNaN(seats) || seats <= 0) {
+          showToast('Введіть коректну кількість місць', 'error');
+          return;
+      }
+      if (!model) {
+          showToast('Введіть модель автомобіля', 'error');
+          return;
+      }
+      if (isNaN(year) || year <= 0) {
+          showToast('Введіть коректний рік випуску', 'error');
+          return;
+      }
+
+      const success = await addVehicle(plate, seats, model, year);
+
+      if (success) {
+          plateInput.value = '';
+          seatsInput.value = '';
+          modelInput.value = '';
+          yearInput.value = '';
+
+          // Перехід на вкладку "Усі автомобілі"
+          document.querySelector('.tab[data-target="all-vehicles"]').click();
+      }
+  });
+
+  // Глобальна функція для оренди автомобіля
+  window.rentVehicle = rentVehicle;
+
+  // Глобальна функція для повернення автомобіля
+  window.returnVehicle = returnVehicle;
+
+  // Глобальна функція для видалення автомобіля
+  window.deleteVehicle = deleteVehicle;
+
+  // Завантаження даних при першому відкритті сторінки
+  document.addEventListener('DOMContentLoaded', () => {
+      loadAllVehicles();
+      loadStats();
+  });
+</script>
+</body>
+</html>
