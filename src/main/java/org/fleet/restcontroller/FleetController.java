@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping
 public class FleetController {
     @Autowired
@@ -44,8 +45,9 @@ public class FleetController {
         fleetService.returnVehicle(plate);
     }
     @PostMapping("/addVehicle")
-    public void addVehicle(@RequestParam String plate, @RequestParam int seats) {
-        fleetService.addVehicle(plate, seats);
+    public void addVehicle(@RequestParam String plate, @RequestParam int seats,
+                           @RequestParam String model, @RequestParam int year) {
+        fleetService.addVehicle(plate, seats, model, year);
     }
     @DeleteMapping("/deleteVehicle")
     public void deleteVehicle(@RequestParam String plate) {

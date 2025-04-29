@@ -3,70 +3,80 @@ package org.fleet.services;
 import org.fleet.dtos.VehicleStats;
 import org.fleet.models.Car;
 import org.fleet.models.Vehicle;
+import org.fleet.repositories.FleetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class FleetService {
+    @Autowired
+    private FleetRepository fleetRepository;
+
     private List<Vehicle> vehicles = new ArrayList<>();
 
     public FleetService() {
-        vehicles.add(new Car("ВС2272КН",5));
-        vehicles.add(new Car("АІ5634МС",8));
     }
 
     public List<Vehicle> getVehicles() {
-        return vehicles;
+        return fleetRepository.findAll();
     }
+
     public void rentVehicle(String plate) {
-        vehicles.stream()
-                .filter(vehicle -> vehicle.getLicensePlate().equals(plate) && vehicle.isAvailable())
-                .findFirst()
-                .ifPresent(vehicle -> vehicle.setAvailable(false));
+        Vehicle vehicle = fleetRepository.getByPlate(plate).stream().findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+        vehicle.setUnavailable();
+        fleetRepository.save(vehicle);
     }
+
     public void returnVehicle(String plate) {
-        vehicles.stream()
-                .filter(vehicle -> vehicle.getLicensePlate().equals(plate) && !vehicle.isAvailable())
-                .findFirst()
-                .ifPresent(vehicle -> vehicle.setAvailable(true));
+        Vehicle vehicle = fleetRepository.getByPlate(plate).stream().findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+        vehicle.setAvailable();
+        fleetRepository.save(vehicle);
     }
-   public List<Vehicle> getAvailableVehicles() {
-        return vehicles.stream()
+
+    public List<Vehicle> getAvailableVehicles() {
+        return fleetRepository.findAll().stream()
                 .filter(Vehicle::isAvailable)
                 .collect(Collectors.toList());
    }
 
     public VehicleStats getStats() {
-        long total = vehicles.size();
-        long available = vehicles.stream().filter(Vehicle::isAvailable).count();
-        long rented = total - available;
+        vehicles = fleetRepository.findAll();
+        if (vehicles.isEmpty()) {
+            return new VehicleStats(0, 0, 0);
+        }
+
+        int total = vehicles.size();
+        int available = (int) vehicles.stream().filter(Vehicle::isAvailable).count();
+        int rented = total - available;
 
         return new VehicleStats(total, available, rented);
     }
 
     public List<Vehicle> searchByPlate(String query) {
         String q = query.toLowerCase();
-        return vehicles.stream()
-                .filter(v -> v.getLicensePlate().toLowerCase().contains(q))
+
+        return fleetRepository.findAll().stream()
+                .filter(vehicle -> vehicle.getPlate().toLowerCase().contains(q))
                 .collect(Collectors.toList());
     }
-    public void addVehicle(String plate, int seats) {
-        boolean exists = vehicles.stream()
-                .anyMatch(v -> v.getLicensePlate().equalsIgnoreCase(plate));
-        if (exists) {
-            throw new IllegalArgumentException("Авто з цим номерним знаком : " + plate + " вже зареєстровано.");
-        }
-        vehicles.add(new Car(plate, seats));
+
+    public void addVehicle(String plate, int seats, String model, int year) {
+        fleetRepository.save(new Car(plate, seats, model, year));
     }
+
     public void deleteVehicle(String plate) {
-        boolean removed = vehicles.removeIf(vehicle -> vehicle.getLicensePlate().equalsIgnoreCase(plate));
-        if (!removed) {
+        Vehicle vehicle = fleetRepository.getByPlate(plate).get(0);
+        if (vehicle == null) {
             throw new IllegalArgumentException("Авто з цим номерним знаком : " + plate + " не знайдено.");
         }
+
+        fleetRepository.deleteById(plate);
     }
 
 }
