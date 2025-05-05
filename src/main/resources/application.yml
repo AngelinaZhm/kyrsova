@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://Anhelina:2580@cluster0.nzii6qy.mongodb.net/Vehicle
